@@ -1,0 +1,29 @@
+name: My first github action
+on: [push]
+jobs:
+  build-app:
+    runs-on: ubuntu-latest
+    env:
+      VERCEL_ORG_ID: ${{secrets.VERCEL_ORG_ID}}
+      VERCEL_PROJECT_ID: ${{secrets.VERCEL_PROJECT_ID}}
+      VERCEL_TOKEN: ${{secrets.VERCEL_TOKEN}}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "14.17.6"
+      - name: Instaling Node Modules
+        run: yarn
+      - name: Build the project
+        run: yarn build
+      - name: Sets the Vercel env
+        run: |
+          cd build
+          mkdir .vercel
+          cd .vercel
+          touch project.json 
+          echo "{\"projectId\": \"$VERCEL_PROJECT_ID\",\"orgId\": \"$VERCEL_ORG_ID\" }"  > project.json
+      - name: Deploying the project
+        run: yarn deploy
+      - name: Setup Finished
+        run: echo "Hurray"
